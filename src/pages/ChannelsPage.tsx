@@ -688,7 +688,7 @@ export default function ChannelsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 fade-in">
       <Group justify="space-between">
         <div>
           <Text size="xl" fw={700}>IM 渠道管理</Text>
@@ -703,7 +703,7 @@ export default function ChannelsPage() {
               void handleRefreshChannels()
             }}
             loading={refreshing}
-            size="md"
+            size="sm"
             className="cursor-pointer"
           >
             刷新
@@ -715,10 +715,10 @@ export default function ChannelsPage() {
               setConfigStep('channel-connect')
               setShowConfigModal(true)
             }}
-            size="md"
+            size="sm"
             className="cursor-pointer"
           >
-            添加渠道
+            + 添加渠道
           </Button>
         </Group>
       </Group>

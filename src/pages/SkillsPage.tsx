@@ -597,7 +597,18 @@ export default function SkillsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Loader size="md" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            border: '3px solid var(--app-border)',
+            borderTopColor: 'var(--mantine-color-brand-5)',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+          <Text size="sm" c="dimmed">加载中...</Text>
+        </div>
       </div>
     )
   }
@@ -605,7 +616,7 @@ export default function SkillsPage() {
   const isSearching = deferredSearch.trim().length > 0
 
   return (
-    <div className="p-6 h-full overflow-y-auto">
+    <div className="p-6 h-full overflow-y-auto fade-in">
       {/* Header */}
       <Group justify="space-between" mb="xs">
         <div>

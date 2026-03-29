@@ -1076,14 +1076,25 @@ export default function Dashboard({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <Loader size="lg" />
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            border: '3px solid var(--app-border)',
+            borderTopColor: 'var(--mantine-color-brand-5)',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
+        <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        <Text size="sm" c="dimmed">正在加载面板...</Text>
       </div>
     )
   }
 
   return (
-    <div className="p-4 space-y-2">
+    <div className="p-4 space-y-2 fade-in">
       {modelError && (
         <Alert color="red" variant="light">
           {modelError}

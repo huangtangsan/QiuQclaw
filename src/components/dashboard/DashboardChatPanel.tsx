@@ -90,14 +90,14 @@ function buildComposerHint(params: {
   canPatchModel: boolean
 }): string {
   if (!params.hasSession) {
-    return '发送首条消息后可切换会话模型 · Enter 发送 · Shift+Enter 换行'
+    return '发送首条消息后可切换会话模型 · Enter 换行 · Shift+Enter 发送'
   }
 
   if (!params.canPatchModel) {
-    return '当前会话暂不支持切换模型 · Enter 发送 · Shift+Enter 换行'
+    return '当前会话暂不支持切换模型 · Enter 换行 · Shift+Enter 发送'
   }
 
-  return '模型切换仅影响当前会话 · Enter 发送 · Shift+Enter 换行'
+  return '模型切换仅影响当前会话 · Enter 换行 · Shift+Enter 发送'
 }
 
 function buildEmptyTranscript(sessionId: string): ChatTranscript {
@@ -1416,16 +1416,26 @@ export default function DashboardChatPanel({
                 )}
               </div>
             ) : showFullscreenLoader ? (
-              <div style={{ display: 'flex', height: '100%', minHeight: 150, alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', height: '100%', minHeight: 150, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  border: '3px solid var(--app-border)',
+                  borderTopColor: 'var(--mantine-color-brand-5)',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
                 <Text size="xs" c="dimmed">正在准备聊天环境...</Text>
+                <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
               </div>
             ) : renderedMessages.length > 0 ? (
               <Stack gap="md">
-                {renderedMessages.map((message) => {
+                {renderedMessages.map((message, msgIdx) => {
                   const displayText = resolveChatMessageDisplayText(message.text)
                   const messageText = displayText.body
                   if (!messageText) return null
                   const canCopyMessage = message.status !== 'pending' && Boolean(messageText.trim())
+                  const isStreaming = message.status === 'pending' && message.role === 'assistant'
                   const usageLabel = formatUsageLabel(message.usage)
                   const statusLabel =
                     message.status === 'pending'
@@ -1445,15 +1455,41 @@ export default function DashboardChatPanel({
                   return (
                     <div
                       key={message.id}
-                      style={{ display: 'flex', justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start' }}
+                      className="message-in"
+                      style={{
+                        display: 'flex',
+                        justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+                        animationDelay: `${Math.min(msgIdx * 20, 120)}ms`,
+                      }}
                     >
+                      {/* 助手头像 */}
+                      {message.role === 'assistant' && (
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: '50%',
+                            background: 'var(--mantine-color-brand-light)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            marginRight: 8,
+                            marginTop: 4,
+                            fontSize: 13,
+                          }}
+                        >
+                          🤖
+                        </div>
+                      )}
+
                       <div
                         style={{
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
-                          gap: 6,
-                          maxWidth: '82%',
+                          gap: 4,
+                          maxWidth: '80%',
                         }}
                       >
                         <Paper
@@ -1466,39 +1502,51 @@ export default function DashboardChatPanel({
                               ? {
                                   backgroundColor: 'var(--app-bg-bubble-user)',
                                   color: 'var(--app-text-bubble-user)',
-                                  border: message.status === 'pending' ? '1px solid var(--mantine-color-default-border)' : undefined,
+                                  border: '1px solid rgba(32,201,151,0.2)',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                                 }
                               : message.status === 'error'
                                 ? {
-                                    backgroundColor: 'rgba(239,68,68,0.1)',
+                                    backgroundColor: 'rgba(239,68,68,0.08)',
                                     color: 'var(--app-text-danger)',
                                     border: '1px solid rgba(239,68,68,0.2)',
                                   }
                                 : {
                                     backgroundColor: 'var(--app-bg-bubble-assistant)',
                                     color: 'var(--app-text-bubble-assistant)',
-                                    border: message.status === 'pending' ? '1px solid var(--mantine-color-default-border)' : undefined,
-                                    opacity: message.status === 'pending' ? 0.7 : undefined,
+                                    border: '1px solid var(--app-border)',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                    opacity: (message.status === 'pending' && message.role !== 'assistant') ? 0.7 : undefined,
                                   }
                           }
                         >
                           <Text
                             size="sm"
-                            lh={1.7}
+                            lh={1.75}
+                            className={isStreaming && messageText ? 'typing-cursor' : ''}
                             style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                           >
                             {messageText}
+                            {isStreaming && !messageText && (
+                              <span className="typing-cursor" style={{ display: 'inline-block' }}>&nbsp;</span>
+                            )}
                           </Text>
                         </Paper>
 
                         {(metaItems.length > 0 || canCopyMessage) && (
                           <Group
-                            gap={8}
+                            gap={6}
                             wrap="wrap"
                             justify={message.role === 'user' ? 'flex-end' : 'flex-start'}
+                            style={{ paddingLeft: message.role === 'user' ? 0 : 4, paddingRight: message.role === 'user' ? 4 : 0 }}
                           >
                             {metaItems.map((item, index) => (
-                              <Text key={`${message.id}:${index}:${item}`} size="xs" c="dimmed">
+                              <Text
+                                key={`${message.id}:${index}:${item}`}
+                                size="xs"
+                                c="dimmed"
+                                style={{ fontSize: 11 }}
+                              >
                                 {item}
                               </Text>
                             ))}
@@ -1508,20 +1556,43 @@ export default function DashboardChatPanel({
                                 color="gray"
                                 size="compact-xs"
                                 onClick={() => void handleCopyMessage(message)}
+                                style={{ fontSize: 11, height: 20, padding: '0 6px' }}
                               >
-                                {copiedMessageId === message.id ? '已复制' : '复制'}
+                                {copiedMessageId === message.id ? '✓ 已复制' : '复制'}
                               </Button>
                             )}
                           </Group>
                         )}
                       </div>
+
+                      {/* 用户头像 */}
+                      {message.role === 'user' && (
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: '50%',
+                            background: 'var(--mantine-color-brand-light)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            marginLeft: 8,
+                            marginTop: 4,
+                            fontSize: 13,
+                          }}
+                        >
+                          👤
+                        </div>
+                      )}
                     </div>
                   )
                 })}
               </Stack>
             ) : (
-              <div style={{ display: 'flex', height: '100%', minHeight: 150, flexDirection: 'column', justifyContent: 'center' }}>
-                <Text size="sm">
+              <div className="slide-up" style={{ display: 'flex', height: '100%', minHeight: 150, flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
+                <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 4 }}>💬</div>
+                <Text size="sm" fw={500} ta="center">
                   {activeSessionStatus.sessionOrigin === 'external-direct'
                     ? activeSessionStatus.willForkOnSend
                       ? '这是一个已有 OpenClaw 历史会话，但当前缺少可续写标识。'
@@ -1532,15 +1603,15 @@ export default function DashboardChatPanel({
                         : '这是一个渠道来源会话，Direct Chat 会继续写入该会话。'
                       : activeSession
                         ? '这是当前 Qclaw 本地 direct 会话，新的消息会继续写入本地 transcript。'
-                        : '这里会直接复用当前默认模型，让您快速验证模型是否正常响应。'}
+                        : '开始一次对话吧'}
                 </Text>
-                <Text size="xs" c="dimmed" mt={4}>
+                <Text size="xs" c="dimmed" ta="center">
                   {activeSession
                     ? '您可以继续发送消息，确认 provider、模型和网关都已经打通。'
                     : '您可以先发一句简单问题，确认 provider、模型和网关都已经打通。'}
                 </Text>
                 {!activeSession && (
-                  <Group mt="sm" gap="xs">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 8 }}>
                     {QUICK_PROMPTS.map((prompt) => (
                       <Button
                         key={prompt}
@@ -1551,11 +1622,16 @@ export default function DashboardChatPanel({
                           void handleSend(prompt)
                         }}
                         disabled={sending}
+                        style={{
+                          borderRadius: '999px',
+                          fontSize: 12,
+                          transition: 'all 0.15s ease',
+                        }}
                       >
                         {prompt}
                       </Button>
                     ))}
-                  </Group>
+                  </div>
                 )}
               </div>
             )}
@@ -1614,7 +1690,7 @@ export default function DashboardChatPanel({
               value={draft}
               onChange={(event) => setDraft(event.currentTarget.value)}
               onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
+                if (event.key === 'Enter' && event.shiftKey) {
                   event.preventDefault()
                   void handleSend()
                 }

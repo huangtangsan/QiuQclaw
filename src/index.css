@@ -29,50 +29,127 @@ code {
   font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
+/* ── 滚动条 ── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--mantine-color-surface-7);
-  border-radius: 3px;
+  background: var(--mantine-color-surface-7, rgba(100,100,100,.35));
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mantine-color-surface-5, rgba(100,100,100,.55));
 }
 
+/* ── 动画关键帧 ── */
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
   50% { box-shadow: 0 0 6px 2px rgba(52, 211, 153, 0.3); }
 }
 
 @keyframes message-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)  scale(1); }
 }
 
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.message-in {
-  animation: message-in 0.2s ease-out;
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* 语义化颜色工具类 — 自动适配亮/暗模式 */
-.app-text-primary { color: var(--app-text-primary) !important; }
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes nav-indicator {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+/* ── 动画工具类 ── */
+.pulse-glow  { animation: pulse-glow  2s   ease-in-out infinite; }
+.message-in  { animation: message-in  0.22s cubic-bezier(.22,1,.36,1) both; }
+.fade-in     { animation: fade-in     0.2s  ease-out both; }
+.slide-up    { animation: slide-up    0.25s cubic-bezier(.22,1,.36,1) both; }
+.slide-down  { animation: slide-down  0.2s  ease-out both; }
+.scale-in    { animation: scale-in    0.2s  cubic-bezier(.22,1,.36,1) both; }
+
+/* 打字机光标 */
+.typing-cursor::after {
+  content: '▋';
+  display: inline-block;
+  animation: blink-cursor 0.8s ease-in-out infinite;
+  margin-left: 1px;
+  font-size: 0.85em;
+  vertical-align: baseline;
+  color: var(--mantine-color-brand-5);
+}
+
+/* 骨架屏 shimmer */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--app-bg-tertiary) 25%,
+    var(--app-bg-inset)    50%,
+    var(--app-bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+}
+
+/* 导航激活指示条 */
+.nav-active-bar {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--mantine-color-brand-filled);
+  animation: nav-indicator 0.18s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* ── 语义化颜色工具类 — 自动适配亮/暗模式 ── */
+.app-text-primary   { color: var(--app-text-primary)   !important; }
 .app-text-secondary { color: var(--app-text-secondary) !important; }
-.app-text-tertiary { color: var(--app-text-tertiary) !important; }
-.app-text-muted { color: var(--app-text-muted) !important; }
-.app-text-faint { color: var(--app-text-faint) !important; }
-.app-text-success { color: var(--app-text-success) !important; }
-.app-text-warning { color: var(--app-text-warning) !important; }
-.app-text-danger { color: var(--app-text-danger) !important; }
+.app-text-tertiary  { color: var(--app-text-tertiary)  !important; }
+.app-text-muted     { color: var(--app-text-muted)     !important; }
+.app-text-faint     { color: var(--app-text-faint)     !important; }
+.app-text-success   { color: var(--app-text-success)   !important; }
+.app-text-warning   { color: var(--app-text-warning)   !important; }
+.app-text-danger    { color: var(--app-text-danger)    !important; }
 
-.app-bg-primary { background-color: var(--app-bg-primary) !important; }
+.app-bg-primary   { background-color: var(--app-bg-primary)   !important; }
 .app-bg-secondary { background-color: var(--app-bg-secondary) !important; }
-.app-bg-tertiary { background-color: var(--app-bg-tertiary) !important; }
-.app-bg-inset { background-color: var(--app-bg-inset) !important; }
-.app-bg-input { background-color: var(--app-bg-input) !important; }
+.app-bg-tertiary  { background-color: var(--app-bg-tertiary)  !important; }
+.app-bg-inset     { background-color: var(--app-bg-inset)     !important; }
+.app-bg-input     { background-color: var(--app-bg-input)     !important; }
 
-.app-border { border-color: var(--app-border) !important; }
+.app-border       { border-color: var(--app-border)       !important; }
 .app-border-light { border-color: var(--app-border-light) !important; }

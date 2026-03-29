@@ -90,7 +90,7 @@ export default function SettingsPage({
   const [showReconfigureConfirm, setShowReconfigureConfirm] = useState(false)
 
   return (
-    <div className="p-4 space-y-2">
+    <div className="p-4 space-y-2 fade-in">
       {/* 通用工具 */}
       <Section title="通用">
         <Group gap="xs" grow>
