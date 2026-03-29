@@ -12,17 +12,18 @@ import {
 describe('openclaw version policy', () => {
   it('classifies versions against the fixed supported window', () => {
     expect(MIN_SUPPORTED_OPENCLAW_VERSION).toBe('2026.3.22')
-    expect(MAX_SUPPORTED_OPENCLAW_VERSION).toBe('2026.3.24')
-    expect(PINNED_OPENCLAW_VERSION).toBe('2026.3.24')
+    expect(MAX_SUPPORTED_OPENCLAW_VERSION).toBe('2026.3.28')
+    expect(PINNED_OPENCLAW_VERSION).toBe('2026.3.28')
     expect(classifyOpenClawVersionLockState('2026.3.21')).toBe('below_min')
     expect(classifyOpenClawVersionLockState('2026.3.22')).toBe('supported_not_target')
     expect(classifyOpenClawVersionLockState('2026.3.23')).toBe('supported_not_target')
-    expect(classifyOpenClawVersionLockState('2026.3.24')).toBe('supported_target')
-    expect(classifyOpenClawVersionLockState('2026.3.25')).toBe('above_max')
+    expect(classifyOpenClawVersionLockState('2026.3.25')).toBe('supported_not_target')
+    expect(classifyOpenClawVersionLockState('2026.3.28')).toBe('supported_target')
+    expect(classifyOpenClawVersionLockState('2026.3.29')).toBe('above_max')
   })
 
   it('normalizes loose release tags before classifying', () => {
-    expect(classifyOpenClawVersionLockState('v2026.3.24-2')).toBe('supported_target')
+    expect(classifyOpenClawVersionLockState('v2026.3.28-2')).toBe('supported_target')
   })
 
   it('only auto-corrects sources that can be safely pinned in place', () => {
@@ -51,7 +52,7 @@ describe('openclaw version policy', () => {
     ).toMatchObject({
       enforcement: 'manual_block',
       targetAction: 'none',
-      targetVersion: '2026.3.24',
+      targetVersion: '2026.3.28',
       blocksContinue: true,
       canSelfHeal: false,
     })
@@ -67,7 +68,7 @@ describe('openclaw version policy', () => {
       policyState: 'below_min',
       enforcement: 'auto_correct',
       targetAction: 'upgrade',
-      targetVersion: '2026.3.24',
+      targetVersion: '2026.3.28',
       blocksContinue: true,
       canSelfHeal: true,
     })
@@ -81,7 +82,7 @@ describe('openclaw version policy', () => {
       policyState: 'supported_not_target',
       enforcement: 'optional_upgrade',
       targetAction: 'upgrade',
-      targetVersion: '2026.3.24',
+      targetVersion: '2026.3.28',
       blocksContinue: false,
       canSelfHeal: true,
     })
@@ -95,14 +96,14 @@ describe('openclaw version policy', () => {
       policyState: 'supported_not_target',
       enforcement: 'manual_block',
       targetAction: 'upgrade',
-      targetVersion: '2026.3.24',
+      targetVersion: '2026.3.28',
       blocksContinue: false,
       canSelfHeal: false,
     })
 
     expect(
       resolveOpenClawVersionEnforcement({
-        version: '2026.3.24',
+        version: '2026.3.28',
         installSource: 'npm-global',
       })
     ).toMatchObject({
@@ -120,11 +121,11 @@ describe('openclaw version policy', () => {
         installSource: 'npm-global',
       })
     ).toMatchObject({
-      policyState: 'above_max',
-      enforcement: 'auto_correct',
-      targetAction: 'downgrade',
-      targetVersion: '2026.3.24',
-      blocksContinue: true,
+      policyState: 'supported_not_target',
+      enforcement: 'optional_upgrade',
+      targetAction: 'upgrade',
+      targetVersion: '2026.3.28',
+      blocksContinue: false,
       canSelfHeal: true,
     })
 
@@ -134,10 +135,38 @@ describe('openclaw version policy', () => {
         installSource: 'custom',
       })
     ).toMatchObject({
+      policyState: 'supported_not_target',
+      enforcement: 'manual_block',
+      targetAction: 'upgrade',
+      targetVersion: '2026.3.28',
+      blocksContinue: false,
+      canSelfHeal: false,
+    })
+
+    expect(
+      resolveOpenClawVersionEnforcement({
+        version: '2026.3.29',
+        installSource: 'npm-global',
+      })
+    ).toMatchObject({
+      policyState: 'above_max',
+      enforcement: 'auto_correct',
+      targetAction: 'downgrade',
+      targetVersion: '2026.3.28',
+      blocksContinue: true,
+      canSelfHeal: true,
+    })
+
+    expect(
+      resolveOpenClawVersionEnforcement({
+        version: '2026.3.29',
+        installSource: 'custom',
+      })
+    ).toMatchObject({
       policyState: 'above_max',
       enforcement: 'manual_block',
       targetAction: 'downgrade',
-      targetVersion: '2026.3.24',
+      targetVersion: '2026.3.28',
       blocksContinue: true,
       canSelfHeal: false,
     })

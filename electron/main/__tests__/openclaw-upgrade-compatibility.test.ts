@@ -27,6 +27,8 @@ describe('openclaw upgrade compatibility', () => {
     expect(detectOpenClawVersionBand('2026.3.22')).toBe('openclaw_2026_3_22')
     expect(detectOpenClawVersionBand('2026.3.23')).toBe('openclaw_2026_3_23_to_2026_3_24')
     expect(detectOpenClawVersionBand('2026.3.24')).toBe('openclaw_2026_3_23_to_2026_3_24')
+    expect(detectOpenClawVersionBand('2026.3.25')).toBe('openclaw_2026_3_25_to_2026_3_28')
+    expect(detectOpenClawVersionBand('2026.3.28')).toBe('openclaw_2026_3_25_to_2026_3_28')
   })
 
   it('marks unaudited future versions as conservative mode', () => {
@@ -62,19 +64,19 @@ describe('openclaw upgrade compatibility', () => {
     expect(assessment.summary).toContain('doctor --fix')
   })
 
-  it('treats the pinned 2026.3.24 target as an audited downgrade destination', () => {
+  it('treats the pinned 2026.3.28 target as an audited upgrade destination', () => {
     const assessment = assessOpenClawUpgradeCompatibility({
-      currentVersion: '2026.3.24',
-      previousVersion: '2026.3.25',
+      currentVersion: '2026.3.28',
+      previousVersion: '2026.3.24',
       assessedAt: '2026-03-29T10:00:00.000Z',
     })
 
-    expect(assessment.status).toBe('downgrade_detected')
-    expect(assessment.currentBand).toBe('openclaw_2026_3_23_to_2026_3_24')
+    expect(assessment.status).toBe('upgrade_detected')
+    expect(assessment.currentBand).toBe('openclaw_2026_3_25_to_2026_3_28')
     expect(assessment.conservativeMode).toBe(false)
     expect(assessment.warningCodes).toContain('runtime_reconcile_required')
-    expect(assessment.summary).toContain('2026.3.25')
     expect(assessment.summary).toContain('2026.3.24')
+    expect(assessment.summary).toContain('2026.3.28')
     expect(assessment.summary).toContain('doctor --fix')
   })
 })

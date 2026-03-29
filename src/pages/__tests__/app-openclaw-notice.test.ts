@@ -13,7 +13,7 @@ describe('buildOpenClaw322Notice', () => {
           status: 'unknown_future_version',
           currentVersion: '2026.3.28',
           currentBand: 'unknown_future',
-          previousVersion: '2026.3.24',
+          previousVersion: '2026.3.28',
           previousBand: 'openclaw_2026_3_23_to_2026_3_24',
           conservativeMode: true,
           warningCodes: ['version_unknown_future'],
@@ -34,7 +34,7 @@ describe('buildOpenClaw322Notice', () => {
           lastActions: [],
         },
       },
-      '2026.3.24'
+      '2026.3.28'
     )
 
     const notice = buildOpenClaw322Notice({
@@ -43,9 +43,8 @@ describe('buildOpenClaw322Notice', () => {
       gatewayRunning: null,
     })
 
-    expect(notice?.title).toBe('OpenClaw 2026.3.24 运行时被阻塞')
-    expect(notice?.message).toContain('当前检测到 OpenClaw 2026.3.24。')
-    expect(notice?.message).not.toContain('当前检测到 OpenClaw 2026.3.28。')
+    expect(notice?.title).toBe('OpenClaw 2026.3.28 运行时被阻塞')
+    expect(notice?.message).toContain('当前检测到 OpenClaw 2026.3.28')
   })
 
   it('normalizes raw CLI version banners before notice rendering', () => {
@@ -59,7 +58,7 @@ describe('buildOpenClaw322Notice', () => {
           status: 'unknown_future_version',
           currentVersion: '2026.3.28',
           currentBand: 'unknown_future',
-          previousVersion: '2026.3.24',
+          previousVersion: '2026.3.28',
           previousBand: 'openclaw_2026_3_23_to_2026_3_24',
           conservativeMode: true,
           warningCodes: ['version_unknown_future'],
@@ -80,7 +79,7 @@ describe('buildOpenClaw322Notice', () => {
           lastActions: [],
         },
       },
-      'OpenClaw 2026.3.24 (cff6dc9)'
+      'OpenClaw 2026.3.28 (cff6dc9)'
     )
 
     const notice = buildOpenClaw322Notice({
@@ -89,8 +88,8 @@ describe('buildOpenClaw322Notice', () => {
       gatewayRunning: null,
     })
 
-    expect(notice?.title).toBe('OpenClaw 2026.3.24 运行时被阻塞')
-    expect(notice?.message).toContain('当前检测到 OpenClaw 2026.3.24。')
+    expect(notice?.title).toBe('OpenClaw 2026.3.28 运行时被阻塞')
+    expect(notice?.message).toContain('当前检测到 OpenClaw 2026.3.28。')
     expect(notice?.message).not.toContain('OpenClaw OpenClaw')
     expect(notice?.message).not.toContain('(cff6dc9)')
   })
@@ -99,18 +98,18 @@ describe('buildOpenClaw322Notice', () => {
     const notice = buildOpenClaw322Notice({
       runtimeStore: {
         version: 1,
-        lastSeenOpenClawVersion: '2026.3.24',
+        lastSeenOpenClawVersion: '2026.3.28',
         lastSeenVersionBand: 'openclaw_2026_3_23_to_2026_3_24',
         lastSeenAt: '2026-03-29T00:00:00.000Z',
         lastCompatibility: {
           status: 'steady_state',
-          currentVersion: '2026.3.24',
+          currentVersion: '2026.3.28',
           currentBand: 'openclaw_2026_3_23_to_2026_3_24',
-          previousVersion: '2026.3.24',
+          previousVersion: '2026.3.28',
           previousBand: 'openclaw_2026_3_23_to_2026_3_24',
           conservativeMode: false,
           warningCodes: [],
-          summary: 'OpenClaw 版本维持在 2026.3.24。',
+          summary: 'OpenClaw 版本维持在 2026.3.28。',
           assessedAt: '2026-03-29T00:00:00.000Z',
         },
         runtime: {
@@ -145,7 +144,7 @@ describe('buildOpenClaw322Notice', () => {
           status: 'unknown_future_version',
           currentVersion: '2026.3.28',
           currentBand: 'unknown_future',
-          previousVersion: '2026.3.24',
+          previousVersion: '2026.3.28',
           previousBand: 'openclaw_2026_3_23_to_2026_3_24',
           conservativeMode: true,
           warningCodes: ['version_unknown_future'],

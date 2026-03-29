@@ -58,6 +58,7 @@ export function detectOpenClawVersionBand(version: string | null | undefined): O
   if (compareOpenClawVersions(normalized, '2026.3.21') <= 0) return 'openclaw_2026_3_14_to_2026_3_21'
   if (compareOpenClawVersions(normalized, '2026.3.22') === 0) return 'openclaw_2026_3_22'
   if (compareOpenClawVersions(normalized, '2026.3.24') <= 0) return 'openclaw_2026_3_23_to_2026_3_24'
+  if (compareOpenClawVersions(normalized, '2026.3.28') <= 0) return 'openclaw_2026_3_25_to_2026_3_28'
   return 'unknown_future'
 }
 
@@ -107,6 +108,12 @@ function buildWarningCodes(
     }
   }
 
+  if (currentBand === 'openclaw_2026_3_25_to_2026_3_28') {
+    if (status === 'upgrade_detected' || status === 'downgrade_detected') {
+      warnings.push('runtime_reconcile_required', 'official_doctor_fix_migration_prioritized_in_2026_3_28')
+    }
+  }
+
   return warnings
 }
 
@@ -147,6 +154,20 @@ function build2026_3_24CompatibilitySuffix(warningCodes: string[]): string {
   return details.length > 0 ? ` ${details.join('；')}。` : ''
 }
 
+function build2026_3_28CompatibilitySuffix(warningCodes: string[]): string {
+  if (warningCodes.length === 0) return ''
+
+  const details: string[] = []
+  if (warningCodes.includes('runtime_reconcile_required')) {
+    details.push('需要重新确认 Gateway/Auth 运行时是否已消费当前 3.28 版本的配置')
+  }
+  if (warningCodes.includes('official_doctor_fix_migration_prioritized_in_2026_3_28')) {
+    details.push('升级到 3.28 时应优先复用官方 doctor --fix 迁移路径')
+  }
+
+  return details.length > 0 ? ` ${details.join('；')}。` : ''
+}
+
 function buildSummary(
   status: UpgradeCompatibilityStatus,
   currentVersion: string | null,
@@ -159,7 +180,9 @@ function buildSummary(
       ? build2026_3_22CompatibilitySuffix(warningCodes)
       : currentBand === 'openclaw_2026_3_23_to_2026_3_24'
         ? build2026_3_24CompatibilitySuffix(warningCodes)
-        : ''
+        : currentBand === 'openclaw_2026_3_25_to_2026_3_28'
+          ? build2026_3_28CompatibilitySuffix(warningCodes)
+          : ''
   switch (status) {
     case 'first_observed':
       return `首次记录到 OpenClaw 版本 ${currentVersion}，当前版本段为 ${currentBand}。${suffix}`.trim()
